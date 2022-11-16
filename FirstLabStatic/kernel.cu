@@ -98,6 +98,15 @@ void substractWithCuda(int* c, const int* a, const int* b, uint32_t size)
     // Choose which GPU to run on, change this on a multi-GPU system.
     checkStatus(cudaSetDevice, 0);
 
+    // инициализируем события
+    cudaEvent_t start, stop;
+    float elapsedTime;
+    // создаем события
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    // запись события
+    cudaEventRecord(start, 0);
+
     // Allocate GPU buffers for three vectors (two input, one output)    .
     cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
     checkError(cudaStatus);
@@ -112,14 +121,8 @@ void substractWithCuda(int* c, const int* a, const int* b, uint32_t size)
     cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
     checkError(cudaStatus);
 
-    auto start = high_resolution_clock::now();
-
     // Launch a kernel on the GPU with one thread for each element.
     substractKernel<<<1, size >>> (dev_c, dev_a, dev_b);
-
-    auto stop = high_resolution_clock::now();
-
-    auto duration = duration_cast<microseconds>(stop - start);
 
     std::cout << "Time taken by GPU function: "
         << duration.count() << " microseconds" << std::endl;
@@ -136,6 +139,16 @@ void substractWithCuda(int* c, const int* a, const int* b, uint32_t size)
     // Copy output vector from GPU buffer to host memory.
     cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
     checkError(cudaStatus);
+
+    cudaStatus = cudaEventRecord(stop, 0);
+    checkError(cudaStatus);
+    cudaStatus = cudaEventSynchronize(stop);
+    checkError(cudaStatus);
+    cudaStatus = cudaEventElapsedTime(&elapsedTime, start, stop);
+    checkError(cudaStatus);
+
+    // вывод информации
+    printf("Time spent executing by the GPU: %.2f milliseconds\n", elapsedTime);
 
     // Free resources.
     cudaFree(dev_c);
