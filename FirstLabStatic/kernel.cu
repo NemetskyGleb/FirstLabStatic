@@ -124,9 +124,6 @@ void substractWithCuda(int* c, const int* a, const int* b, uint32_t size)
     // Launch a kernel on the GPU with one thread for each element.
     substractKernel<<<1, size >>> (dev_c, dev_a, dev_b);
 
-    std::cout << "Time taken by GPU function: "
-        << duration.count() << " microseconds" << std::endl;
-
     // Check for any errors launching the kernel
     cudaStatus = cudaGetLastError();
     checkError(cudaStatus);
