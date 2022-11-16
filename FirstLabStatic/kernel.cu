@@ -35,7 +35,7 @@ void calculateFunctionTime(int* c, const int* a, const int* b, uint32_t size,
 
     auto stop = high_resolution_clock::now();
 
-    auto duration = duration_cast<microseconds>(stop - start);
+    auto duration = duration_cast<milliseconds>(stop - start);
 
     std::cout << "Time taken by CPU function: "
         << duration.count() << " microseconds" << std::endl;
