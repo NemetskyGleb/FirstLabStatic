@@ -38,7 +38,7 @@ void calculateFunctionTime(int* c, const int* a, const int* b, uint32_t size,
     auto duration = duration_cast<milliseconds>(stop - start);
 
     std::cout << "Time taken by CPU function: "
-        << duration.count() << " microseconds" << std::endl;
+        << duration.count() << " milliseconds" << std::endl;
 }
 
 template<typename FUNC, typename... Args>
@@ -71,7 +71,6 @@ int main()
 
     cudaError_t cudaStatus = cudaDeviceReset();
 
-    getchar();
     return 0;
 }
 
